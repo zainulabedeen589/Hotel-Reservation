@@ -184,19 +184,16 @@ http://127.0.0.1:5000/
 
 ---
 
-## 👨‍💻 Author
+## 👨‍💻 Developer
 
-**Zainul Abedeen**
+## **Zainul Abedeen**
+
+### [GitHub](https://github.com/zainulabedeen589)
+
+### [LinkedIn](https://linkedin.com/in/zainulabedeen589)
 
 ---
 
 ## ⭐ Support
 
-If you like this project:
-
-👉 Give it a ⭐ on GitHub
-👉 Share it with others
-
----
-
-💡 *Built with passion for AI & Web Development*
+If you found this project helpful, consider giving it a star on GitHub.
