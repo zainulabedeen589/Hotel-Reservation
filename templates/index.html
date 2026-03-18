@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hotel AI</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+body {
+    margin: 0;
+    overflow: hidden;
+    background: #020617;
+}
+
+#bgCanvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+
+.card {
+    position: relative;
+    z-index: 10;
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(12px);
+    border-radius: 20px;
+    padding: 40px;
+    width: 900px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+}
+
+input {
+    background: rgba(0,0,0,0.4);
+    color: white;
+}
+</style>
+</head>
+
+<body class="flex items-center justify-center min-h-screen text-white">
+
+<canvas id="bgCanvas"></canvas>
+
+<div class="card">
+    <h1 class="text-3xl font-bold text-center mb-6">🏨 Hotel AI Predictor</h1>
+
+    <div class="grid grid-cols-2 gap-4">
+        <input id="lead_time" placeholder="Lead Time" class="p-3 rounded">
+        <input id="market" placeholder="Market Segment" class="p-3 rounded">
+        <input id="price" placeholder="Price" class="p-3 rounded">
+        <input id="requests" placeholder="Requests" class="p-3 rounded">
+        <input id="month" placeholder="Month" class="p-3 rounded">
+        <input id="adults" placeholder="Adults" class="p-3 rounded">
+        <input id="week" placeholder="Week Nights" class="p-3 rounded">
+        <input id="meal" placeholder="Meal Plan" class="p-3 rounded">
+        <input id="room" placeholder="Room Type" class="p-3 rounded">
+        <input id="weekend" placeholder="Weekend Nights" class="p-3 rounded">
+    </div>
+
+    <button onclick="predict()" class="mt-6 w-full bg-indigo-500 p-3 rounded font-bold hover:scale-105 transition">
+        Predict
+    </button>
+
+    <div id="result" class="text-center mt-6 text-xl"></div>
+</div>
+
+<script>
+const canvas = document.getElementById("bgCanvas");
+const ctx = canvas.getContext("2d");
+
+let particles = [];
+let mouse = { x: 0, y: 0 };
+
+function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener("resize", resize);
+
+// mouse tracking
+window.addEventListener("mousemove", (e) => {
+    mouse.x = e.clientX;
+    mouse.y = e.clientY;
+});
+
+// 🔥 HIGH DENSITY RANDOM (based on screen size)
+function createParticles() {
+    particles = [];
+
+    const density = (canvas.width * canvas.height) / 4000; // 🔥 auto density
+
+    for (let i = 0; i < density; i++) {
+        particles.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            vx: (Math.random() - 0.5) * 0.3,
+            vy: (Math.random() - 0.5) * 0.3
+        });
+    }
+}
+
+createParticles();
+window.addEventListener("resize", createParticles);
+
+function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    particles.forEach(p => {
+        // movement
+        p.x += p.vx;
+        p.y += p.vy;
+
+        // bounce edges
+        if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+        if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+
+        // repel from cursor
+        let dx = p.x - mouse.x;
+        let dy = p.y - mouse.y;
+        let dist = Math.sqrt(dx * dx + dy * dy);
+
+        if (dist < 100 && dist > 0) {
+            let force = (100 - dist) / 100;
+            p.x += (dx / dist) * force * 4;
+            p.y += (dy / dist) * force * 4;
+        }
+
+        // draw
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 1.5, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(255,255,255,0.7)";
+        ctx.fill();
+    });
+
+    requestAnimationFrame(draw);
+}
+draw();
+
+
+// ---------------- PREDICT ----------------
+function predict() {
+    const data = {
+        lead_time: +document.getElementById('lead_time').value,
+        market_segment_type: +document.getElementById('market').value,
+        avg_price_per_room: +document.getElementById('price').value,
+        no_of_special_requests: +document.getElementById('requests').value,
+        arrival_month: +document.getElementById('month').value,
+        no_of_adults: +document.getElementById('adults').value,
+        no_of_week_nights: +document.getElementById('week').value,
+        type_of_meal_plan: +document.getElementById('meal').value,
+        room_type_reserved: +document.getElementById('room').value,
+        no_of_weekend_nights: +document.getElementById('weekend').value
+    };
+
+    fetch('/predict', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(data)
+    })
+    .then(res => res.json())
+    .then(res => {
+        const el = document.getElementById('result');
+        if(res.prediction === 1){
+            el.innerHTML = "⚠️ Likely Cancelled";
+            el.style.color = "#ef4444";
+        } else {
+            el.innerHTML = "✅ Booking Safe";
+            el.style.color = "#22c55e";
+        }
+    });
+}
+</script>
+
+</body>
+</html>
