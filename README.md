@@ -21,10 +21,10 @@ The UI includes a **dynamic particle background** and a **glassmorphism card des
 
 ## 🎯 Features
 
-✅ Real-time prediction using trained ML model
-✅ Clean and responsive UI (Tailwind CSS)
-✅ Interactive particle background (cursor-based repulsion)
-✅ Robust backend with validation & error handling
+✅ Real-time prediction using trained ML model \
+✅ Clean and responsive UI (Tailwind CSS) \
+✅ Interactive particle background (cursor-based repulsion) \
+✅ Robust backend with validation & error handling \
 ✅ REST API-based architecture
 
 ---
